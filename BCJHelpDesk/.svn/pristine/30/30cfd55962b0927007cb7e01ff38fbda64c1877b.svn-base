@@ -1,0 +1,99 @@
+package com.crmindz.bcjmay2017.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.crmindz.bcjmay2017.dao.EmployeeTicketsDAO;
+import com.crmindz.bcjmay2017.pojo.Ticket;
+
+/**
+ * @author Siva Reddy
+ *
+ *         Implements methods to generate business logic wherever required and forward/retrieve data to/from DAO.
+ */
+@Service
+public class EmployeeTicketsService {
+
+	@Autowired
+	public EmployeeTicketsDAO employeeTicketsDao;
+
+	/**
+	 * Retrieves list of tickets which are new from student/consultant.
+	 * 
+	 * @return Returns a list of new tickets.
+	 */
+	public List<Ticket> fetchNewTickets() {
+
+		List<Ticket> newTicketsList = employeeTicketsDao.fetchNewTickets();
+		return newTicketsList;
+	}
+
+	
+	
+	/**
+	 * Retrieves list of tickets which are approved for student/consultant.
+	 * 
+	 * @return Returns a list of approved tickets.
+	 */
+	public List<Ticket> fetchApprovedTickets() {
+
+		List<Ticket> approvedTicketsList = employeeTicketsDao.fetchApprovedTickets();
+		return approvedTicketsList;
+	}
+
+	
+	
+	/**
+	 * Forwards list of tickets which are denied for student/consultant.
+	 * 
+	 * @return Returns a list of denied tickets.
+	 */
+	public List<Ticket> fetchDeniedTickets() {
+
+		List<Ticket> deniedTicketsList = employeeTicketsDao.fetchDeniedTickets();
+		return deniedTicketsList;
+	}
+
+	
+	
+	/**
+	 * Forward's ticket to DAO to update ticket details by changing status.
+	 * 
+	 * @param ticket
+	 *            Gets the ticket details in ticket entity class.
+	 * @param userId
+	 * @return Returns boolean if ticket approval is success or not.
+	 */
+	public boolean approveTicket(Ticket ticket, int userId) {
+
+		ticket.setStatus("Approved");
+		if (employeeTicketsDao.approveTicket(ticket, userId)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	
+	
+	/**
+	 * Forward's ticket to DAO to update ticket details by changing status.
+	 * 
+	 * @param ticket
+	 *            Gets the ticket details in ticket entity class.
+	 * @param userId
+	 * @return Returns boolean if ticket denial is success or not.
+	 */
+	public boolean rejectTicket(Ticket ticket, int userId) {
+
+		ticket.setStatus("Denied");
+		if (employeeTicketsDao.rejectTicket(ticket, userId)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+}

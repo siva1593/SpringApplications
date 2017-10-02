@@ -1,0 +1,133 @@
+package com.crmindz.bcjmay2017.dao;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcOperations;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
+
+import com.crmindz.bcjmay2017.pojo.Ticket;
+
+/**
+ * @author Siva Reddy
+ *
+ *         It is a repository which connects with database to perform CRUD
+ *         operations. It has implementation of abstract methods.
+ */
+@Repository
+public class TicketDAOImpl implements TicketDAO{
+
+	@Autowired
+	JdbcTemplate jdbcTemplate;
+	@Autowired
+	JdbcOperations jdbcOperations;
+	private static final Logger logger = Logger.getLogger(TicketDAOImpl.class);
+	
+	public List<String> getTicketCategoryInfo() {
+
+		String query = "select categoryName from category";
+		List<Map<String, Object>> userType = jdbcTemplate.queryForList(query);
+		List<String> listOfValue = new ArrayList<String>();
+		for (Map<String, Object> map : userType) {
+			for (Map.Entry<String, Object> entry : map.entrySet()) {
+				logger.info(entry.getKey() + " - " + entry.getValue());
+				listOfValue.add((String) entry.getValue());
+
+			}
+		}
+
+		return (List<String>) listOfValue;
+	}
+
+	
+	public List<String> getTicketSubCategoryInfo(String ticketCategoryName) {
+
+		logger.info("In dao class, verifyUser method");
+		String query = "select category_id from category where categoryName = ?";
+
+		int categoryId = 0;
+		try {
+			categoryId = jdbcTemplate.queryForObject(query, new Object[] { ticketCategoryName }, Integer.class);
+			if (0 != categoryId) {
+				String query1 = "select subcategoryName from subcategory where category_id = ?";
+				List<Map<String, Object>> userType = jdbcTemplate.queryForList(query1, new Object[] { categoryId });
+				List<String> listOfValue = new ArrayList<String>();
+				for (Map<String, Object> map : userType) {
+					for (Map.Entry<String, Object> entry : map.entrySet()) {
+						// logger.info(entry.getKey() + " - " +
+						// entry.getValue());
+						listOfValue.add((String) entry.getValue());
+
+					}
+				}
+				return (List<String>) listOfValue;
+			}
+
+		} catch (EmptyResultDataAccessException e) {
+			logger.info("exception is handled");
+		}
+		return null;
+	}
+
+	
+	
+	public boolean createTicket(Ticket ticket, int userId) {
+
+		logger.info("in dao class, saveTicket method");
+		logger.info(ticket.getSubCategory() + "  " + ticket.getDescription());
+
+		String query = "insert into ticket (ticketNo, category,subCategory,description,subject,status,comments,user_id) values (?,?,?,?,?,?,?,?)";
+		Object[] args = new Object[] { ticket.getTicketNo(), ticket.getCategory(), ticket.getSubCategory(),
+				ticket.getDescription(), ticket.getSubject(), ticket.getStatus(), ticket.getComments(), userId };
+		if (0 != jdbcOperations.update(query, args)) {
+			logger.info("user details inserted successfully");
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	
+	
+	public List<Ticket> getTicketsListByUserId(int user_Id) {
+
+		logger.info("getTicketmethod");
+
+		String query = "select ticketNo,category,subCategory,description,subject,status,comments from ticket where user_id = ?";
+
+		// using RowMapper anonymous class, we can create a separate RowMapper
+		// for reuse
+
+		List<Map<String, Object>> rows = jdbcTemplate.queryForList(query, new Object[] { user_Id });
+		List<Ticket> userTickets = new ArrayList<Ticket>();
+
+		for (Map<String, Object> row : rows) {
+			Ticket ticket = new Ticket();
+
+			ticket.setTicketNo((Integer) (row.get("ticketNo")));
+			System.out.println(row.get("ticketNo"));
+			ticket.setCategory((String) row.get("category"));
+			ticket.setSubCategory((String) row.get("subCategory"));
+			ticket.setDescription((String) row.get("description"));
+			ticket.setSubject((String) row.get("subject"));
+			ticket.setStatus((String) row.get("status"));
+			ticket.setComments((String) row.get("comments"));
+			userTickets.add(ticket);
+
+		}
+
+		System.out.println("dao ticket data");
+		if (!userTickets.isEmpty()) {
+			System.out.println(userTickets.get(0).getCategory());
+		}
+
+		return userTickets;
+	}
+
+	
+}

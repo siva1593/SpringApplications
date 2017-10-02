@@ -1,0 +1,136 @@
+package com.crmindz.bcjmay2017.controller;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.crmindz.bcjmay2017.pojo.Ticket;
+import com.crmindz.bcjmay2017.service.TicketService;
+
+
+/**
+ * This class implements methods and maps the requests related to
+ * student/consultant tickets like creating, displaying. It also has some data
+ * populating methods.
+ * 
+ * @author Siva Reddy
+ *
+ */
+@Controller
+public class TicketController {
+	
+	/**
+	 * A instance of Service class.
+	 */
+	@Autowired
+	private TicketService ticketService;
+	 private static final Logger logger = Logger.getLogger(TicketController.class);
+	
+	 
+	/** 
+	 * Map's the request to retrieve tickets.
+	 * @return a view page to display tickets.
+	 */
+	@RequestMapping(value ="/ticketHandler")
+	public String showTicketDashboard()
+	{
+		return "Tickets";
+	}
+	  
+	
+	/**
+	 * This method Forwards list of tickets for a requested user.
+	 * 
+	 * @param session To get user Id for the session
+	 * @return A list of tickets by user Id
+	 * @throws IOException
+	 */
+	@RequestMapping( value = "/ticketsDashboard")
+	@ResponseBody
+	public List<Ticket> fetchTicketsData(HttpSession session) throws IOException {
+	
+		 int user_Id= (Integer)session.getAttribute("userId");
+		 
+		 List<Ticket> ticketList=ticketService.getTicketsListByUserId(user_Id);
+		 
+	      return ticketList;
+
+	 }
+	
+	
+	/**
+	 * This method map's request to create new ticket and forwards category for populating data in the view.
+	 * 
+	 * @return A view page to create new ticket with a list that has categories.
+	 */
+	@RequestMapping(value = "/Raise Ticket", method = RequestMethod.GET)
+	public @ResponseBody ModelAndView showTicketFormWithCategory() {
+	
+	 logger.info("In controller class, ticketCreation Method");
+	
+	String ticketCategory=ticketService.getTicketCategoryInfo();;
+	
+	ModelAndView modelView = new ModelAndView("NewTicket");
+	modelView.addObject("ticketCategory",ticketCategory);
+	return modelView;
+
+	}
+	
+	
+	/**
+	 * This method forwards sub category based on the category selected by user.
+	 * 
+	 * @param request
+	 * @param model It has category value information.
+	 * @return A list of sub category.
+	 */
+	@RequestMapping("/ticketSubCategory")
+	@ResponseBody
+	public String getTicketSubCategoryInfo(HttpServletRequest request, Model model) {
+		
+		logger.info("In controller class, ticketSubCategory Method");
+		String categoryValue=request.getParameter("categoryValue");
+		logger.info(categoryValue);
+		
+		String ticketSubCategory=ticketService.getTicketSubCategoryInfo(categoryValue);;
+
+		return ticketSubCategory;
+
+	}
+	
+	
+	/**
+	 * Render's the view based on the CRUD operation.
+	 * 
+	 * @param model  Gets the ticket's data to be approved.
+	 * @param ticket The model data is mapped with the ticket entity class.
+	 * @param session To get the user Id.
+	 * @return return message and view.
+	 */
+	@RequestMapping(value = "/submitTicket", method = RequestMethod.POST)
+	public String saveTicket(Ticket ticket, Model model, HttpSession session) {
+		logger.info("In controller class, saveTicket method");
+		
+		int userId = (Integer) session.getAttribute("userId");
+		logger.info("User Id in ticket method " + userId);
+		
+		if (ticketService.saveTicket(ticket,userId)) {
+			return "Tickets";
+		} else {
+			return "login";
+		}
+
+	}
+	 
+}

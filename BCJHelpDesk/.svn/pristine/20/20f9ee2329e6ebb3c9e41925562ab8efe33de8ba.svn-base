@@ -1,0 +1,648 @@
+<%@ page isELIgnored="false"%>
+<%@ taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
+<%@ taglib prefix="spring" uri="http://www.springframework.org/tags"%>
+<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+<%@page language="java" contentType="text/html; charset=ISO-8859-1"
+	pageEncoding="ISO-8859-1"%>
+<!DOCTYPE html>
+<html>
+<head>
+<title>BCJ-HelpDesk</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script
+	src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<link rel="stylesheet"
+	href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/redmond/jquery-ui.min.css">
+<link rel="stylesheet"
+	href="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.14.0/css/ui.jqgrid.min.css">
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script
+	src="https://cdnjs.cloudflare.com/ajax/libs/free-jqgrid/4.14.0/jquery.jqgrid.min.js"></script>
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="<c:url value="/resources/js/welcome.js" />"></script>
+<link href="<c:url value="/resources/css/welcome.css" />"
+	rel="stylesheet">
+
+</head>
+<body>
+	<nav class="navbar navbar-inverse">
+		<div class="container-fluid">
+			<!-- Menu Items -->
+			<div class="navbar-header">
+				<a class="navbar-brand "><b>Ektha Solutions</b></a>
+			</div>
+			<ul class="nav navbar-nav">
+				<li class="active"><a href="#" title="Home">Home</a></li>
+				<li><a id="ticketsDashboard" href="ticketsDashboard">Tickets</a></li>
+				<li><a href="#" title="contact">Contact</a></li>
+			</ul>
+			<!-- Sign Out -->
+			<ul class="nav navbar-nav navbar-right">
+				<li data-toggle="modal" data-target="#logout"><a href="logout"><span
+						class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+			</ul>
+		</div>
+	</nav>
+	
+<div id="message"><h4>${message}</h4></div>
+
+	<div align="center">
+		<table id="new">
+
+			<tr>
+
+				<td />
+
+			</tr>
+
+		</table>
+		<div id="newPager"></div>
+
+	</div>
+	<br><br>
+	
+
+	<script type="text/javascript">
+    
+  $(document).ready(function(){
+		 
+	  $("#new").jqGrid({
+
+	                url : "newTickets",
+
+	                datatype : "json",
+
+	                mtype : 'POST',
+
+	                colNames : [ 'ticketNo','category','subCategory','description','subject','status','comments'],
+
+	                colModel : [ {
+
+	                        name : 'ticketNo',
+
+	                        index : 'ticketNo',
+
+	                        width : 150
+
+	                }, {
+
+	                        name : 'category',
+
+	                        index : 'category',
+
+	                        width : 150,
+
+	                        editable : false
+
+	                }, {
+
+	                        name : 'subCategory',
+
+	                        index : 'subCategory',
+
+	                        width : 150,
+
+	                        editable : false
+
+	                },
+	                	{
+
+                        name : 'description',
+
+                        index : 'description',
+
+                        width : 150,
+
+                        editable : false
+
+                	},
+	                  {
+	                	  
+	                	  name : 'subject',
+
+	                      index : 'subject',
+
+	                      width : 150,
+
+	                      editable : false
+	                	  
+	                  },
+	                
+	                {
+	                	 name : 'status',
+
+	                     index : 'status',
+
+	                     width : 150,
+
+	                     editable : false
+	                	
+	                },
+	                {
+	                	 name : 'comments',
+
+	                     index : 'comments',
+
+	                     width : 150,
+
+	                     editable : false
+	                	
+	                }],
+
+	                pager : '#newPager',
+
+	                rowNum : 10,
+
+	                height: 'auto',
+
+	                rowList : [ 10 ],
+
+	                sortname : 'invid',
+
+	                sortorder : 'desc',
+
+	                viewrecords : true,
+
+	                gridview : true,
+
+	                multiselect: true,
+
+	                multiboxonly: false,
+
+	                caption : 'New Tickets',
+
+	                jsonReader : {
+
+	                        repeatitems : false,
+
+	                }
+
+	        });
+	  
+	  
+	  jQuery("#new").jqGrid('navGrid', '#newPager', {
+
+          edit : false,
+
+          add : false,
+
+          del : false,
+
+          search : false
+
+  }); 
+  
+  
+  jQuery("#approve").click( function(){
+	 
+   	var slectedRow = jQuery('#new').jqGrid('getGridParam','selrow');    	
+  	if(slectedRow){  
+  	var ticketDetails = jQuery('#new').jqGrid('getRowData',slectedRow);  		
+  		$('#ticketNo').val(ticketDetails.ticketNo);
+  		$('#subject').val(ticketDetails.subject);
+  		$('#category').val(ticketDetails.category);
+  		$('#subCategory').val(ticketDetails.subCategory);
+  		$('#description').val(ticketDetails.description);
+   	}else{
+  		alert("Please select a row");
+   	}
+  	
+});
+  
+  
+  
+  jQuery("#reject").click( function(){
+	 
+   	var Row = jQuery('#new').jqGrid('getGridParam','selrow');    	
+  	if(Row){  
+  	var deniedTicketDetails = jQuery('#new').jqGrid('getRowData',Row);  
+  		$('#deniedTicketNo').val(deniedTicketDetails.ticketNo);
+  		$('#deniedSubject').val(deniedTicketDetails.subject);
+  		$('#deniedCategory').val(deniedTicketDetails.category);
+  		$('#deniedSubCategory').val(deniedTicketDetails.subCategory);
+  		$('#deniedDescription').val(deniedTicketDetails.description);
+   	}else{
+  		alert("Please select a row");
+   	}
+  	
+});
+  
+  		 
+	  $("#approved").jqGrid({
+
+	                url : "approvedTickets",
+
+	                datatype : "json",
+
+	                mtype : 'POST',
+
+	                colNames : [ 'ticketNo','category','subCategory','description','subject','status','comments'],
+
+	                colModel : [ {
+
+	                        name : 'ticketNo',
+
+	                        index : 'ticketNo',
+
+	                        width : 150
+
+	                }, {
+
+	                        name : 'category',
+
+	                        index : 'category',
+
+	                        width : 150,
+
+	                        editable : false
+
+	                }, {
+
+	                        name : 'subCategory',
+
+	                        index : 'subCategory',
+
+	                        width : 150,
+
+	                        editable : false
+
+	                },
+	                	{
+
+                        name : 'description',
+
+                        index : 'description',
+
+                        width : 150,
+
+                        editable : false
+
+                	},
+	                  {
+	                	  
+	                	  name : 'subject',
+
+	                      index : 'subject',
+
+	                      width : 150,
+
+	                      editable : false
+	                	  
+	                  },
+	                
+	                {
+	                	 name : 'status',
+
+	                     index : 'status',
+
+	                     width : 150,
+
+	                     editable : false
+	                	
+	                },
+	                {
+	                	 name : 'comments',
+
+	                     index : 'comments',
+
+	                     width : 150,
+
+	                     editable : false
+	                	
+	                }],
+
+	                pager : '#approvedPager',
+
+	                rowNum : 10,
+
+	                height: 'auto',
+
+	                rowList : [ 10 ],
+
+	                sortname : 'invid',
+
+	                sortorder : 'desc',
+
+	                viewrecords : true,
+
+	                gridview : true,
+
+	                multiselect: true,
+
+	                multiboxonly: false,
+
+	                caption : 'Approved Tickets',
+
+	                jsonReader : {
+
+	                        repeatitems : false,
+
+	                }
+
+	        });
+	  
+	  
+	  jQuery("#approved").jqGrid('navGrid', '#approvedPager', {
+
+          edit : false,
+
+          add : false,
+
+          del : false,
+
+          search : false
+
+  });
+  
+  
+  
+  	  $("#rejected").jqGrid({
+
+	                url : "deniedTickets",
+
+	                datatype : "json",
+
+	                mtype : 'POST',
+
+	                colNames : [ 'ticketNo','category','subCategory','description','subject','status','comments'],
+
+	                colModel : [ {
+
+	                        name : 'ticketNo',
+
+	                        index : 'ticketNo',
+
+	                        width : 150
+
+	                }, {
+
+	                        name : 'category',
+
+	                        index : 'category',
+
+	                        width : 150,
+
+	                        editable : false
+
+	                }, {
+
+	                        name : 'subCategory',
+
+	                        index : 'subCategory',
+
+	                        width : 150,
+
+	                        editable : false
+
+	                },
+	                	{
+
+                        name : 'description',
+
+                        index : 'description',
+
+                        width : 150,
+
+                        editable : false
+
+                	},
+	                  {
+	                	  
+	                	  name : 'subject',
+
+	                      index : 'subject',
+
+	                      width : 150,
+
+	                      editable : false
+	                	  
+	                  },
+	                
+	                {
+	                	 name : 'status',
+
+	                     index : 'status',
+
+	                     width : 150,
+
+	                     editable : false
+	                	
+	                },
+	                {
+	                	 name : 'comments',
+
+	                     index : 'comments',
+
+	                     width : 150,
+
+	                     editable : false
+	                	
+	                }],
+
+	                pager : '#deniedPager',
+
+	                rowNum : 10,
+
+	                height: 'auto',
+
+	                rowList : [ 10 ],
+
+	                sortname : 'invid',
+
+	                sortorder : 'desc',
+
+	                viewrecords : true,
+
+	                gridview : true,
+
+	                multiselect: true,
+
+	                multiboxonly: false,
+
+	                caption : 'Denied Tickets',
+
+	                jsonReader : {
+
+	                        repeatitems : false,
+
+	                }
+
+	        });
+	  
+	  
+	  jQuery("#rejected").jqGrid('navGrid', '#deniedPager', {
+
+          edit : false,
+
+          add : false,
+
+          del : false,
+
+          search : false
+
+  });
+
+	 }); 
+
+	  </script>
+
+
+	
+
+<!-- Modal -->
+			
+<form action="approveTicket" method="POST" class="form-horizontal">
+<div class="container">
+				<div class="modal fade" id="ApproveTicket" role="dialog">
+					<div class="modal-dialog">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Ticket Details</h4>
+							</div>
+							<div class="modal-body">
+							<div class="form-group">
+								<label class="control-label col-sm-2" for="ticketNo">Ticket #:</label><div class="col-sm-3"><input class="form-control" id="ticketNo" type="text" name="ticketNo"
+									readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="subject">Subject:</label><div class="col-sm-6"><input class="form-control" id="subject" type="text" name="subject" readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="category">Category:</label><div class="col-sm-5"><input class="form-control" id="category" type="text" name="category"
+									readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="subCategory">SubCategory:</label><div class="col-sm-5"><input class="form-control" id="subCategory" type="text"
+									name="subCategory" readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="description">Description:</label><div class="col-sm-7"><input class="form-control" id="description" type="text"
+									name="description" readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="comments">Comments:</label><div class="col-sm-7">
+								<textarea class="form-control" id="comments" name="comments" rows="5" cols="25"
+									maxlength="255" placeholder="Write Comments Here.."></textarea>
+							</div></div></div>
+							<div class="modal-footer">
+								<button type="submit" class="btn btn-default">Ok</button>
+								&nbsp;&nbsp;&nbsp;
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Cancel</button>
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+			
+			</form>
+<form action="rejectTicket" method="POST" class="form-horizontal">
+<div class="container">
+				<div class="modal fade" id="RejectTicket" role="dialog">
+					<div class="modal-dialog">
+
+						<!-- Modal content-->
+						<div class="modal-content">
+							<div class="modal-header">
+								<button type="button" class="close" data-dismiss="modal">&times;</button>
+								<h4 class="modal-title">Ticket Details</h4>
+							</div>
+							<div class="modal-body">
+							<div class="form-group">
+								<label class="control-label col-sm-2" for="deniedTicketNo">Ticket #:</label><div class="col-sm-3"><input class="form-control" id="deniedTicketNo" type="text" name="ticketNo"
+									readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="deniedSubject">Subject:</label><div class="col-sm-6"><input class="form-control" id="deniedSubject" type="text" name="subject" readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="deniedCategory">Category:</label><div class="col-sm-5"><input class="form-control" id="deniedCategory" type="text" name="category"
+									readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="deniedSubCategory">SubCategory:</label><div class="col-sm-5"><input class="form-control" id="deniedSubCategory" type="text"
+									name="subCategory" readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="deniedDescription">Description:</label><div class="col-sm-7"><input class="form-control" id="deniedDescription" type="text"
+									name="description" readonly />
+							</div></div></div>
+							<div class="modal-body"><div class="form-group">
+								<label class="control-label col-sm-2" for="deniedComments">Comments:</label><div class="col-sm-7">
+								<textarea class="form-control" id="deniedComments" name="comments" rows="5" cols="25"
+									maxlength="255" placeholder="Write Comments Here.."></textarea>
+							</div></div></div>
+							<div class="modal-footer">
+								<button type="submit" class="btn btn-default">Ok</button>
+								&nbsp;&nbsp;&nbsp;
+								<button type="button" class="btn btn-default"
+									data-dismiss="modal">Cancel</button>
+							</div>
+
+						</div>
+
+					</div>
+				</div>
+
+			</div>
+			
+			</form>
+			
+
+		
+
+<div align="center">
+				<button id="approve" type="button"
+						class="btn btn-info btn-lg" data-toggle="modal"
+						data-target="#ApproveTicket">Approve Ticket</button>&nbsp;&nbsp;&nbsp;
+
+				<button id="reject" type="button"
+						class="btn btn-info btn-lg" data-toggle="modal"
+						data-target="#RejectTicket">Reject Ticket</button>
+</div>
+	<br><br><br>
+	
+	<div align="center">
+		<table id="approved">
+
+			<tr>
+
+				<td />
+
+			</tr>
+
+		</table>
+		<div id="approvedPager"></div>
+
+	</div>
+	<br><br><br>
+	
+	<div align="center">
+		<table id="rejected">
+
+			<tr>
+
+				<td />
+
+			</tr>
+
+		</table>
+		<div id="deniedPager"></div>
+
+	</div>
+	<div id="result" class="footer"></div>
+</body>
+</html>

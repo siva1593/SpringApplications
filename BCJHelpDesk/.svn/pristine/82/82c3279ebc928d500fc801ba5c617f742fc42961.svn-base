@@ -1,0 +1,96 @@
+package com.crmindz.bcjmay2017.service;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.crmindz.bcjmay2017.dao.HelpDeskDAO;
+import com.crmindz.bcjmay2017.pojo.Ticket;
+
+/**
+ * @author Siva Reddy
+ *
+ * This Class implements methods to generate business logic wherever required.
+ */
+@Service
+public class TicketService {
+	
+	/**
+	 * A instance of DAO Implementation class.
+	 */
+	@Autowired
+	public HelpDeskDAO helpDeskDao;
+	List<Ticket> ticketList = new ArrayList<Ticket>();
+
+
+	/**
+	 * This method retrieves ticket category.
+	 * 
+	 * @return A list, that has categories.
+	 */
+	public String getTicketCategoryInfo() {
+		List<String> ticketCategoryInfo = helpDeskDao.getTicketCategoryInfo();
+		
+		String ticketCategory1="";
+		for(String ticketCategory: ticketCategoryInfo){
+		ticketCategory1 += "<option value='"+ ticketCategory+"'>"+ticketCategory+"</option>";
+		}
+		return ticketCategory1;
+	}
+	
+	/**
+	 * This method forwards sub category based on the category selected by user.
+	 * 
+	 * @param ticketCategoryName
+	 *            It has category value.
+	 * @return A list of sub category.
+	 */
+	public String getTicketSubCategoryInfo(String ticketCategoryName) {
+		List<String> subTicketCategoryInfo = helpDeskDao.getTicketSubCategoryInfo(ticketCategoryName);
+		
+		String ticketSubCategory="";
+		for(String ticketSubCategory1: subTicketCategoryInfo){
+			ticketSubCategory += "<option value='"+ ticketSubCategory1+"'>"+ticketSubCategory1+"</option>";
+		}
+		return ticketSubCategory;
+	}
+
+	
+	/**
+	 * This method generates ticket number and set's
+	 * status of the ticket as pending and comments as under review.
+	 * 
+	 * @param ticket
+	 *            Gets ticket details
+	 * @param userId 
+	 * @return Returns true or false.
+	 */
+	public boolean saveTicket(Ticket ticket, int userId) {
+
+        ticket.setTicketNo((int)(Math.random()*70000));
+        ticket.setStatus("Pending");
+		ticket.setComments("Under Review");
+		if (helpDeskDao.saveTicket(ticket,userId)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+	
+	
+	/**
+	 * Gets User Id and sends request to get list of tickets of the user.
+	 * 
+	 * @param UserId
+	 *            User Id of the user who is requesting the tickets.
+	 * @return Returns a list of tickets of user.
+	 */
+	public List<Ticket> getTicketsListByUserId(int user_Id) {
+		
+		ticketList = helpDeskDao.getTicketsListByUserId(user_Id);
+		return ticketList;
+	}
+
+}

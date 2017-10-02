@@ -1,0 +1,62 @@
+package com.crmindz.bcjmay2017.service;
+
+import java.util.List;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.crmindz.bcjmay2017.dao.HelpDeskDAO;
+import com.crmindz.bcjmay2017.pojo.User;
+
+/**
+ * @author Siva Reddy
+ *
+ * This Class implements methods to generate business logic wherever required.
+ */
+@Service
+public class RegistrationService {
+	
+	/**
+	 * A instance of DAO Implementation class.
+	 */
+	@Autowired
+	private HelpDeskDAO helpDeskDao;
+	private static final Logger logger = Logger.getLogger(RegistrationService.class);
+
+	/**
+	 * This method receives user information to register.
+	 * 
+	 * @param User
+	 *            data in user entity class.
+	 * @return Returns a message if user is register or not.
+	 */
+	public String saveUser(User user) {
+
+		logger.info("In service class, saveUser method");
+		return helpDeskDao.saveUser(user);
+	}
+
+
+	/**
+	 * This method retrieves list of user types.
+	 * 
+	 * @return Returns a list that has user types.
+	 */
+	public List<String> getUserType() {
+		List<String> data = helpDeskDao.getUserType();
+		return data;
+	}
+	
+
+	/**
+	 * This method retrieves list of states in US.
+	 * 
+	 * @return List of States in USA.
+	 */
+	public List<String> getStates() {
+		List<String> data = helpDeskDao.getStates();
+		return data;
+	}
+	
+}

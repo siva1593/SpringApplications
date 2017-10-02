@@ -1,0 +1,160 @@
+package com.crmindz.bcjmay2017.controller;
+
+import java.io.IOException;
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+
+import org.apache.log4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.servlet.ModelAndView;
+
+import com.crmindz.bcjmay2017.pojo.Ticket;
+import com.crmindz.bcjmay2017.service.EmployeeTicketsService;
+
+/**
+ * This class implements methods and maps the requests related to
+ * employee tickets like creating, displaying. It also has some data
+ * populating methods.
+ * 
+ * @author Siva Reddy
+ *
+ */
+@Controller
+public class EmployeeTicketsController {
+	
+	/**
+	 * A instance of Service class.
+	 */
+	 @Autowired
+	  private EmployeeTicketsService employeeTicketsService;
+	  private static final Logger logger = Logger.getLogger(EmployeeTicketsController.class);
+	 
+	  /** 
+		 * Map's the request to retrieve tickets.
+		 * @return a view page to display tickets information.
+		 */
+	  @RequestMapping(value ="/e_ticketHandler")
+		public String showEmployeeTicketDashboard()
+		{
+			return "EmployeeTickets";
+		}
+	  
+	  /**
+		 * This method forwards list of tickets which are pending.
+		 * 
+		 * @return Returns a list of new tickets from students/consultants.
+		 */
+		@RequestMapping( value = "/newTickets")
+		@ResponseBody
+		public List<Ticket> fetchNewTickets() throws IOException {
+	
+			 List<Ticket> newTicketsList=employeeTicketsService.fetchNewTickets();
+			 
+			 logger.info("welcome to Employee New Tickets grid");
+			 
+		      return newTicketsList;
+
+		 }
+		
+		/**
+		 * This method forwards list of tickets which are approved.
+		 * 
+		 * @return Returns a list of approved tickets.
+		 */
+		@RequestMapping( value = "/approvedTickets")
+		@ResponseBody
+		public List<Ticket> fetchApprovedTickets(HttpServletRequest request,HttpSession session) throws IOException {
+			
+			 List<Ticket> approvedTicketsList=employeeTicketsService.fetchApprovedTickets();
+			 
+		      return approvedTicketsList;
+
+		 }
+		
+		/**
+		 * This method forwards list of tickets which are denied.
+		 * 
+		 * @return Returns a list of denied tickets.
+		 */
+		@RequestMapping( value = "/deniedTickets")
+		@ResponseBody
+		public List<Ticket> fetchDeniedTickets(HttpServletRequest request,HttpSession session) throws IOException {
+
+			List<Ticket> pendingTicketsList=employeeTicketsService.fetchDeniedTickets();
+			 
+		      return pendingTicketsList;
+
+		 }
+		
+		
+		/**
+		 * This method render's the view based on the CRUD operation.
+		 * 
+		 * @param model  Gets the ticket's data to be approved.
+		 * @param ticket The model data is mapped with the ticket entity class.
+		 * @param session To get the user Id.
+		 * @return return message and view.
+		 */
+		@RequestMapping(value = "/approveTicket", method = RequestMethod.POST)
+		@ResponseBody
+		public ModelAndView approveTicket(Ticket ticket, Model model, HttpSession session) {
+			logger.info("In controller class, approveTicket method");
+			logger.info(ticket.getComments());
+			
+			int userId = (Integer) session.getAttribute("userId");
+			logger.info("User Id in ticket method " + userId);
+			
+			if (employeeTicketsService.approveTicket(ticket,userId)) {
+				ModelAndView modelView = new ModelAndView("EmployeeTickets");
+				return modelView;
+				
+			} else {
+				
+				ModelAndView modelView = new ModelAndView("EmployeeTickets");
+				modelView.addObject("message", "Ticket is not updated successfully");
+
+				return modelView;
+			}
+
+		}
+		
+		
+		/**
+		 * This method render's the view based on the CRUD operation.
+		 * 
+		 * @param model  Gets the ticket's data to be rejected.
+		 * @param ticket The model data is mapped with the ticket entity class.
+		 * @param session To get the user Id.
+		 * @return return message and view.
+		 */
+		@RequestMapping(value = "/rejectTicket", method = RequestMethod.POST)
+		@ResponseBody
+		public ModelAndView rejectTicket(Ticket ticket, Model model, HttpSession session) {
+			logger.info("In controller class, rejectTicket method");
+			logger.info(ticket.getComments());
+			
+			int userId = (Integer) session.getAttribute("userId");
+			logger.info("User Id in ticket method " + userId);
+			
+			if (employeeTicketsService.rejectTicket(ticket,userId)) {
+				ModelAndView modelView = new ModelAndView("EmployeeTickets");
+				return modelView;
+				
+			} else {
+				
+				ModelAndView modelView = new ModelAndView("EmployeeTickets");
+				modelView.addObject("message", "Ticket is not updated successfully");
+
+				return modelView;
+			}
+
+		}
+
+}

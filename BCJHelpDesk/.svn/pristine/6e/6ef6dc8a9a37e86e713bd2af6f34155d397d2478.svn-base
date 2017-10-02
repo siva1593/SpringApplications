@@ -1,0 +1,86 @@
+package com.crmindz.bcjmay2017.service;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.crmindz.bcjmay2017.dao.HelpDeskDAO;
+import com.crmindz.bcjmay2017.pojo.Ticket;
+
+@Service
+public class EmployeeTicketsService {
+	
+	@Autowired
+	public HelpDeskDAO helpDeskDao;
+	
+
+	/**
+	 * This method forwards list of tickets which are new from student/consultant.
+	 * 
+	 * @return Returns a list of new tickets.
+	 */
+	public List<Ticket> fetchNewTickets() {
+		List<Ticket> newTicketsList = helpDeskDao.fetchNewTickets();
+		return newTicketsList;
+	}
+
+	
+	/**
+	 * This method forwards list of tickets which are approved.
+	 * 
+	 * @return Returns a list of approved tickets.
+	 */
+	public List<Ticket> fetchApprovedTickets() {
+		List<Ticket> approvedTicketsList = helpDeskDao.fetchApprovedTickets();
+		return approvedTicketsList;
+	}
+
+	
+	/**
+	 * This method forwards list of tickets which are denied.
+	 * 
+	 * @return Returns a list of denied tickets.
+	 */
+	public List<Ticket> fetchDeniedTickets() {
+		List<Ticket> deniedTicketsList = helpDeskDao.fetchDeniedTickets();
+		return deniedTicketsList;
+	}
+
+	
+	/**
+	 * This method forward's ticket to DAO to update/approve ticket.
+	 * 
+	 * @param ticket
+	 *            Gets the ticket details in ticket entity class.
+	 * @param userId
+	 * @return Returns boolean if ticket approval is success or not.
+	 */
+	public boolean approveTicket(Ticket ticket, int userId) {
+		ticket.setStatus("Approved");
+		if (helpDeskDao.approveTicket(ticket,userId)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	
+	/**
+	 * This method forward's ticket to DAO to update/deny ticket.
+	 * 
+	 * @param ticket
+	 *            Gets the ticket details in ticket entity class.
+	 * @param userId
+	 * @return Returns boolean if ticket denial is success or not.
+	 */
+	public boolean rejectTicket(Ticket ticket, int userId) {
+		ticket.setStatus("Denied");
+		if (helpDeskDao.rejectTicket(ticket,userId)) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+}

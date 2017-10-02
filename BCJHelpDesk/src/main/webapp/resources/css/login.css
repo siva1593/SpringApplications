@@ -1,0 +1,44 @@
+h2 {
+	color: #0000ff;
+}
+
+h4 {
+	color: #0000ff;
+}
+
+h1 {
+	color: #0000ff;
+}
+
+h5 {
+	color: #008000;
+}
+
+#title {
+	width: 100%;
+	text-align: center;
+	padding: 5px;
+}
+
+.style {
+	width: 50%;
+	margin-right: 0.4em;
+	padding-top: 0.3em;
+	text-align: left;
+}
+.footer {
+  			position: absolute;
+  			right: 0;
+  			bottom: 0;
+  			left: 0;
+ 			padding: 1rem;
+  			background-color: #efefef;
+  			text-align: right;
+}
+#message {
+	text-align: center;
+}
+#c101{
+	width: 100%;
+	padding: 5px;
+}
