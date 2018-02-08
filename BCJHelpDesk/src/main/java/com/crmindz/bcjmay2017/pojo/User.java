@@ -10,6 +10,7 @@ public class User {
 	private Address address;
 	private LoginDetails login;
 	private String age;
+	private String sal;
 
 	/**
 	 * @return the userId
