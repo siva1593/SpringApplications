@@ -11,6 +11,7 @@ public class User {
 	private LoginDetails login;
 	private String age;
 	private String sal;
+	private String emp;
 
 	/**
 	 * @return the userId
