@@ -9,6 +9,7 @@ public class User {
 	private String phone;
 	private Address address;
 	private LoginDetails login;
+	private String age;
 
 	/**
 	 * @return the userId
